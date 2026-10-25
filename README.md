@@ -66,11 +66,11 @@ Antes de ejecutar el proyecto, asegúrate de tener instalado:
 ### 1. Clonar el repositorio
 
 ```bash
-git clone URL_DE_TU_REPOSITORIO
+git clone https://github.com/yeris01/MediCita.git
 cd medicita
 ```
 
-Reemplaza `URL_DE_TU_REPOSITORIO` por la dirección de tu repositorio de GitHub.
+Reemplaza `https://github.com/yeris01/MediCita.git` por la dirección de tu repositorio de GitHub.
 
 ### 2. Crear el entorno virtual
 
