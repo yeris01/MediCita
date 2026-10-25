@@ -1,0 +1,20 @@
+
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Variables y contraseñas privadas
+.env
+.env.*
+
+# Base de datos local
+db.sqlite3
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

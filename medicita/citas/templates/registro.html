@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block c %}<div class="panel auth"><h2>Registrar paciente</h2><form method="post">{% csrf_token %}{{ f.as_div }}
+<label for="tel">Teléfono</label><input id="tel" name="telefono"><label for="ciu">Ciudad</label><input id="ciu" name="ciudad" required>
+<label for="bar">Barrio</label><input id="bar" name="barrio"><label for="exp">Expediente / antecedentes (alergias, enfermedades)</label><textarea id="exp" name="expediente" rows="3" style="width:100%"></textarea>
+<button class="btn" type="submit">Guardar paciente</button></form><p class="note"><a href="{% url 'login' %}">Ya tengo cuenta</a></p></div>{% endblock %}

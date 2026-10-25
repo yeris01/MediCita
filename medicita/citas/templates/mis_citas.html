@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block c %}<div class="panel"><h2>{% if user.is_staff %}Todas las citas{% else %}Mis citas{% endif %}</h2>
+{% for c in citas %}<div class="appt st-{{ c.estado }}"><div class="ah"><b>{{ c.fecha_hora|date:"d/m/Y" }} · {{ c.fecha_hora|time:"H:i" }}</b><span class="tag">{{ c.get_estado_display }}</span>{% if user.is_staff %}<span class="tag">{{ c.paciente.username }}</span>{% endif %}</div>
+{{ c.medico }} · {{ c.medico.especialidad }} · {{ c.medico.centro.nombre }}{% if c.motivo %}<br><small>Motivo: {{ c.motivo }}</small>{% endif %}
+{% if c.estado == "programada" %}<div class="acts"><a class="link" href="{% url 'reprogramar' c.id %}">Reprogramar</a><form class="inline" method="post" action="{% url 'cancelar' c.id %}">{% csrf_token %}<button class="link bad" type="submit">Cancelar</button></form></div>{% endif %}</div>
+{% empty %}<p class="empty">No hay citas todavía.</p>{% endfor %}</div>{% endblock %}

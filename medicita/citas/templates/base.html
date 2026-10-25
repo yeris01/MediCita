@@ -1,0 +1,36 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MediCita – Sistema de citas médicas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'style.css' %}"></head><body>
+<header class="top"><div class="wrap"><div class="bar">
+<b class="brand"><img src="{% static 'logo.svg' %}" alt="" style="height:30px;vertical-align:-7px"> MediCita</b>
+{% if user.is_authenticated %}<div class="ctl"><label>Sesión</label><b>{{ user.username }} · {% if user.is_staff %}Administrativo{% else %}Paciente{% endif %}</b></div>
+<form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="ghost" type="submit">Salir</button></form>{% endif %}</div>
+{% if user.is_authenticated %}{% with n=request.resolver_match.url_name %}<nav aria-label="Secciones">
+<a href="{% url 'buscar' %}" {% if n == 'buscar' or n == 'agendar' or n == 'reprogramar' %}aria-current="page"{% endif %}>Agendar cita</a>
+<a href="{% url 'mis_citas' %}" {% if n == 'mis_citas' %}aria-current="page"{% endif %}>{% if user.is_staff %}Todas las citas{% else %}Mis citas{% endif %}</a>
+{% if user.is_staff %}<a href="{% url 'demografia' %}" {% if n == 'demografia' %}aria-current="page"{% endif %}>Demografía</a><a href="/admin/">Administración</a>{% endif %}
+</nav>{% endwith %}{% endif %}</div></header>
+<main class="wrap">{% for m in messages %}<div class="msg {% if m.tags == 'error' %}err{% endif %}" role="status">{{ m }}</div>{% endfor %}{% block c %}{% endblock %}</main>
+<div class="wrap"><footer>MediCita · Prototipo académico · La clasificación de triage es orientativa y no reemplaza una valoración médica.</footer></div>
+{% if user.is_authenticated %}
+<button id="chatFab" class="fab" type="button" aria-expanded="false" aria-controls="chat"><span class="dot" aria-hidden="true"></span> Triage 24/7</button>
+<section id="chat" class="chat" aria-label="Asistente de triage" hidden>
+<div class="chat-h"><div><b>Asistente de triage</b><small><span class="dot"></span> En línea 24/7 · orientativo, no es un diagnóstico</small></div><button id="chatX" type="button" class="ghost" aria-label="Cerrar chat">✕</button></div>
+<div class="chat-b" id="chatLog" aria-live="polite"></div><div class="chat-q" id="chatQ"></div>
+<form class="chat-f" id="chatForm">{% csrf_token %}<input id="chatIn" autocomplete="off" placeholder="Describe tus síntomas…" aria-label="Escribe tus síntomas"><button class="btn sm" type="submit">Enviar</button></form></section>
+<script>
+(()=>{const f=document.getElementById("chatFab"),c=document.getElementById("chat"),log=document.getElementById("chatLog"),q=document.getElementById("chatQ"),inp=document.getElementById("chatIn");
+const esc=s=>s.replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+const add=(h,k)=>{log.insertAdjacentHTML("beforeend",`<div class="m ${k}">${h}</div>`);log.scrollTop=log.scrollHeight};
+const toggle=o=>{c.hidden=!o;f.setAttribute("aria-expanded",o)};
+f.onclick=()=>toggle(c.hidden);document.getElementById("chatX").onclick=()=>toggle(false);
+async function enviar(t){add(esc(t),"usr");q.innerHTML="";
+const r=await fetch("/chatbot/",{method:"POST",headers:{"X-CSRFToken":document.querySelector("#chatForm [name=csrfmiddlewaretoken]").value},body:JSON.stringify({texto:t})});const d=await r.json();
+add(`<div class="lvbox lv${d.lv}"><b>Urgencia: ${d.nivel}</b><p>${esc(d.mensaje)}</p></div><p class="note">Especialidad sugerida: <b>${esc(d.especialidad)}</b>. Orientativo, no es un diagnóstico.</p><a class="link" href="/?especialidad=${encodeURIComponent(d.especialidad)}">Buscar médicos →</a>`,"bot")}
+document.getElementById("chatForm").onsubmit=e=>{e.preventDefault();const t=inp.value.trim();if(t){inp.value="";enviar(t)}};
+add("Hola, cuéntame tus síntomas y clasifico la urgencia usando tu expediente.","bot");
+q.innerHTML=["Tengo fiebre y tos","Dolor de pecho","Dolor de cabeza"].map(t=>`<button type="button" class="chip" data-q="${t}">${t}</button>`).join("");
+q.onclick=e=>{const t=e.target.dataset.q;if(t)enviar(t)};})();
+</script>{% endif %}</body></html>

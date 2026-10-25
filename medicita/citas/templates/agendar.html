@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block c %}{% if cita %}<div class="banner">Reprogramando tu cita con <b>{{ medico.nombre }}</b> ({{ cita.fecha_hora|date:"d/m/Y H:i" }}). Elige nueva fecha y hora. <a class="link" href="{% url 'mis_citas' %}">Descartar</a></div>{% endif %}
+<div class="grid2"><div class="panel"><h2>{% if cita %}Reprogramar cita{% else %}Agendar cita{% endif %}</h2><p class="sub">{{ medico.nombre }} · {{ medico.especialidad }} · {{ medico.centro }}</p>
+<form method="get" class="row" style="align-items:end"><div><label class="f" for="d">Fecha</label><input id="d" type="date" name="dia" value="{{ dia|date:'Y-m-d' }}" min="{{ hoy|date:'Y-m-d' }}"></div><button class="ghost" type="submit">Ver horarios</button></form>
+<form method="post">{% csrf_token %}<input type="hidden" name="dia" value="{{ dia|date:'Y-m-d' }}">
+{% if user.is_staff and not cita %}<label class="f" for="pa">Usuario del paciente (vacío = tú)</label><input id="pa" name="paciente">{% endif %}
+{% if not cita %}<label class="f" for="mo">Motivo de consulta (opcional)</label><input id="mo" name="motivo" maxlength="120" placeholder="Ej: dolor de cabeza desde hace 3 días">{% endif %}
+<label class="f">Hora</label><div class="row">{% for h in horas %}<label class="chip"><input type="radio" name="hora" value="{{ h.isoformat }}" required>{{ h|time:"H:i" }}<small>Libre</small></label>{% empty %}<p class="empty">Sin horarios libres ese día.</p>{% endfor %}</div>
+<button class="btn" type="submit" {% if not horas %}disabled{% endif %}>{% if cita %}Confirmar nueva fecha{% else %}Confirmar cita{% endif %}</button></form></div>
+<aside class="panel"><h3>Resumen</h3><p><b>{{ medico.nombre }}</b><br>{{ medico.especialidad }}<br>{{ medico.centro.nombre }} · {{ medico.centro.direccion }}<br>{{ dia|date:"d/m/Y" }}</p><p class="note">El sistema valida que no se crucen citas.</p></aside></div>{% endblock %}
